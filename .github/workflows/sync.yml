@@ -14,12 +14,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
-      - name: Sync with upstream
-        uses: repo-sync/github-sync@v2
-        with:
-          source_repo: "https://github.com/Pablox365/warborntest-3eae0eee.git"
-          source_branch: "main"
-          destination_branch: "main"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          files_to_ignore: ".github/workflows/*"
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync with upstream ignoring workflows
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git remote add upstream https://github.com/Pablox365/warborntest-3eae0eee.git
+          git fetch upstream
+          
+          # Merge upstream pero recuperamos nuestros workflows
+          git checkout upstream/main -- .
+          git checkout HEAD -- .github/workflows/
+          
+          # Solo commitear si hay cambios
+          git diff --staged --quiet || git commit -m "chore: sync with upstream"
+          git push origin main
