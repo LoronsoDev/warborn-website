@@ -359,21 +359,42 @@ const AnnouncementsAdmin = () => {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-heading text-lg tracking-wider">ANUNCIOS</h2>
-        <button onClick={() => setEditing({ title: "", content: "", type: "update", active: true })} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-heading tracking-wider">
+        <button onClick={() => setEditing({ emoji: "📢", short_text: "", detailed_description: "", title: "", content: "", type: "update", active: true, play_sound: true, priority: 0, starts_at: "", expires_at: "" })} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-heading tracking-wider">
           <Plus className="w-4 h-4" /> NUEVO
         </button>
       </div>
 
       {editing && (
         <EditForm
-          item={editing}
+          item={{
+            ...editing,
+            // datetime-local needs "YYYY-MM-DDTHH:mm" format
+            starts_at: editing.starts_at ? toLocalInput(editing.starts_at) : "",
+            expires_at: editing.expires_at ? toLocalInput(editing.expires_at) : "",
+          }}
           fields={[
-            { key: "title", label: "Título", type: "text" },
-            { key: "content", label: "Contenido", type: "textarea" },
+            { key: "emoji", label: "Emoji (ej: 🔥 📢 🎮)", type: "text" },
+            { key: "short_text", label: "Texto del popup (corto)", type: "text" },
+            { key: "detailed_description", label: "Descripción detallada (al hacer click)", type: "textarea" },
             { key: "type", label: "Tipo", type: "select", options: ["update", "event", "patch", "alert"] },
+            { key: "starts_at", label: "Empieza el (vacío = ahora)", type: "datetime" },
+            { key: "expires_at", label: "Expira el (vacío = nunca)", type: "datetime" },
+            { key: "play_sound", label: "Reproducir sonido", type: "boolean" },
+            { key: "priority", label: "Prioridad (mayor = primero)", type: "number" },
             { key: "active", label: "Activo", type: "boolean" },
           ]}
-          onSave={(item) => { upsert.mutate(item); setEditing(null); }}
+          onSave={(item) => {
+            const payload = {
+              ...item,
+              // mirror short_text into legacy "title" field (NOT NULL)
+              title: item.short_text || item.title || "Anuncio",
+              content: item.detailed_description || item.content || null,
+              starts_at: item.starts_at ? new Date(item.starts_at).toISOString() : null,
+              expires_at: item.expires_at ? new Date(item.expires_at).toISOString() : null,
+            };
+            upsert.mutate(payload);
+            setEditing(null);
+          }}
           onCancel={() => setEditing(null)}
           saving={upsert.isPending}
         />
@@ -384,10 +405,18 @@ const AnnouncementsAdmin = () => {
           <div key={a.id} className="flex items-center gap-4 bg-card border border-border rounded-lg p-4">
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-heading text-sm tracking-wider">{a.title}</span>
+                <span className="text-xl">{a.emoji || "📢"}</span>
+                <span className="font-heading text-sm tracking-wider">{a.short_text || a.title}</span>
                 <span className="text-[8px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-heading tracking-wider">{a.type.toUpperCase()}</span>
+                <span className={`text-[8px] px-2 py-0.5 rounded-full font-heading tracking-wider ${a.active ? "bg-primary/20 text-primary" : "bg-destructive/20 text-destructive"}`}>{a.active ? "ACTIVO" : "INACTIVO"}</span>
+                {a.expires_at && new Date(a.expires_at) < new Date() && (
+                  <span className="text-[8px] px-2 py-0.5 rounded-full bg-destructive/20 text-destructive font-heading tracking-wider">EXPIRADO</span>
+                )}
               </div>
-              <span className="text-xs text-muted-foreground">{a.content?.slice(0, 100)}</span>
+              <span className="text-xs text-muted-foreground">
+                {(a.detailed_description || a.content || "").slice(0, 100)}
+                {a.expires_at && <span className="ml-2 text-[10px] text-primary/60">· expira {new Date(a.expires_at).toLocaleString("es-ES")}</span>}
+              </span>
             </div>
             <div className="flex gap-2">
               <button onClick={() => setEditing(a)} className="p-2 hover:bg-secondary rounded-lg transition-colors"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
@@ -399,6 +428,13 @@ const AnnouncementsAdmin = () => {
     </div>
   );
 };
+
+// Helper: ISO -> "YYYY-MM-DDTHH:mm" in local timezone for datetime-local inputs
+function toLocalInput(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 // === Feedback Admin ===
 const FeedbackAdmin = () => {
@@ -458,6 +494,7 @@ const FeedbackAdmin = () => {
               </div>
             </div>
             <p className="text-xs text-muted-foreground font-body">{f.message}</p>
+            <FeedbackRepliesAdmin feedbackId={f.id} />
           </div>
         ))}
       </div>
@@ -465,8 +502,67 @@ const FeedbackAdmin = () => {
   );
 };
 
+// === Feedback replies moderation (per review) ===
+const FeedbackRepliesAdmin = ({ feedbackId }: { feedbackId: string }) => {
+  const qc = useQueryClient();
+  const { data: replies } = useQuery({
+    queryKey: ["feedback-replies-admin", feedbackId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("feedback_replies")
+        .select("*")
+        .eq("feedback_id", feedbackId)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const toggle = useMutation({
+    mutationFn: async ({ id, approved }: { id: string; approved: boolean }) => {
+      const { error } = await supabase.from("feedback_replies").update({ approved }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["feedback-replies-admin", feedbackId] }),
+  });
+
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("feedback_replies").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["feedback-replies-admin", feedbackId] }),
+  });
+
+  if (!replies || replies.length === 0) return null;
+
+  return (
+    <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
+      <div className="text-[9px] font-heading tracking-[0.15em] text-muted-foreground">RESPUESTAS ({replies.length})</div>
+      {replies.map((rp: any) => (
+        <div key={rp.id} className="flex items-start justify-between gap-2 bg-secondary/30 rounded-lg p-2 pl-3 border-l-2 border-primary/30">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-heading text-[10px] tracking-wider">{rp.name}</span>
+              <span className={`text-[8px] px-2 py-0.5 rounded-full font-heading tracking-wider ${rp.approved ? "bg-primary/20 text-primary" : "bg-destructive/20 text-destructive"}`}>{rp.approved ? "VISIBLE" : "OCULTA"}</span>
+              <span className="text-[8px] text-muted-foreground">{new Date(rp.created_at).toLocaleString("es-ES")}</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground font-body mt-0.5">{rp.message}</p>
+          </div>
+          <div className="flex gap-1 shrink-0">
+            <button onClick={() => toggle.mutate({ id: rp.id, approved: !rp.approved })} className="px-2 py-1 text-[8px] font-heading tracking-wider rounded border border-border hover:border-primary/50">
+              {rp.approved ? "OCULTAR" : "MOSTRAR"}
+            </button>
+            <button onClick={() => { if (confirm("¿Eliminar respuesta?")) remove.mutate(rp.id); }} className="p-1.5 hover:bg-destructive/10 rounded transition-colors"><Trash2 className="w-3 h-3 text-destructive" /></button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 // === Reusable Edit Form ===
-type FieldDef = { key: string; label: string; type: "text" | "textarea" | "number" | "select" | "boolean" | "csv" | "image" | "image_list"; options?: string[] };
+type FieldDef = { key: string; label: string; type: "text" | "textarea" | "number" | "select" | "boolean" | "csv" | "image" | "image_list" | "datetime"; options?: string[] };
 
 const uploadToImages = async (file: File): Promise<string> => {
   const ext = file.name.split(".").pop() || "jpg";
@@ -577,6 +673,8 @@ const EditForm = ({ item, fields, onSave, onCancel, saving }: { item: any; field
               <button type="button" onClick={() => setForm({ ...form, [f.key]: !form[f.key] })} className={`px-4 py-2 rounded-lg text-xs font-heading tracking-wider border transition-all ${form[f.key] ? "bg-primary text-primary-foreground border-primary" : "bg-secondary border-border text-muted-foreground"}`}>
                 {form[f.key] ? "SÍ" : "NO"}
               </button>
+            ) : f.type === "datetime" ? (
+              <input type="datetime-local" value={form[f.key] ?? ""} onChange={e => setForm({ ...form, [f.key]: e.target.value })} className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm focus:border-primary focus:outline-none transition-colors" />
             ) : (
               <input type={f.type} value={form[f.key] ?? ""} onChange={e => setForm({ ...form, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value })} className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm focus:border-primary focus:outline-none transition-colors" />
             )}
