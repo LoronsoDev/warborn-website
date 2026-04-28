@@ -120,6 +120,20 @@ const Footer = () => (
           POWERED BY <span className="text-primary">ALINEA</span>
         </a>
       </div>
+
+      <div className="mt-4 flex justify-center">
+        <a
+          href="/reportar"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border/60 bg-card/40 text-[11px] font-heading tracking-[0.2em] text-muted-foreground hover:text-primary hover:border-primary/50 hover:bg-primary/5 transition-all"
+        >
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 2v4"/><path d="M12 2v4"/><path d="M16 2v4"/>
+            <rect width="16" height="18" x="4" y="4" rx="2"/>
+            <path d="M8 12h8"/><path d="M8 16h6"/>
+          </svg>
+          REPORTAR BUG O QUEJA
+        </a>
+      </div>
     </div>
   </footer>
 );
