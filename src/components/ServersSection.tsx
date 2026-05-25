@@ -1,5 +1,6 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import warbornNormal from "@/assets/warborn-normal.png";
+import warbornHardcore from "@/assets/warborn-hardcore-clean.png";
 import { Users, MapPin, Wifi, Copy, Play, ExternalLink, Loader2 } from "lucide-react";
 import { useLiveServers, type LiveServer } from "@/hooks/useLiveServers";
 import { toast } from "sonner";
@@ -12,7 +13,16 @@ const META = [
     logo: warbornNormal,
     description: "Partidas fluidas con un equilibrio entre diversión y realismo. Ideal para nuevos jugadores y sesiones casuales.",
     isNormal: true,
-    bmUrl: "https://www.battlemetrics.com/servers/reforger/39028513",
+    bmUrl: "https://www.battlemetrics.com/servers/reforger/38708697",
+  },
+  {
+    key: "hardcore" as const,
+    name: "WARBORN HARDCORE",
+    subtitle: "REALISMO TÁCTICO AVANZADO",
+    logo: warbornHardcore,
+    description: "Experiencia militar inmersiva con comunicación táctica, mods avanzados y reglas estrictas de combate.",
+    isNormal: false,
+    bmUrl: "https://www.battlemetrics.com/servers/reforger/38672956",
   },
 ];
 
@@ -26,7 +36,7 @@ const ServersSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <SectionHeader visible={isVisible} label="SERVIDORES · LIVE" title="ELIGE TU MODO" subtitle="Datos en tiempo real desde BattleMetrics." />
 
-        <div className="grid gap-5 md:gap-6 lg:gap-8 mt-10 md:mt-12 items-stretch max-w-lg mx-auto">
+        <div className="grid md:grid-cols-2 gap-5 md:gap-6 lg:gap-8 mt-10 md:mt-12 items-stretch">
           {META.map((m, i) => {
             const live = data?.[m.key];
             return (
