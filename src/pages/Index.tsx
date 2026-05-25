@@ -8,7 +8,6 @@ import RadioSection from "@/components/RadioSection";
 import MerchSection from "@/components/MerchSection";
 import DonationsSection from "@/components/DonationsSection";
 import PartnersSection from "@/components/PartnersSection";
-import FeedbackSection from "@/components/FeedbackSection";
 import SeoContent from "@/components/SeoContent";
 
 const Index = () => (
@@ -26,7 +25,6 @@ const Index = () => (
     <MerchSection />
     <DonationsSection />
     <PartnersSection />
-    <FeedbackSection />
     <SeoContent
       h1="Warborn — Comunidad española de Arma Reforger"
       intro="Warborn es la principal comunidad hispana de Arma Reforger, con servidores españoles dedicados en modo Normal, Hardcore y Milsim PvE. Si buscas servidores de Arma Reforger en España con jugadores que hablan español, baja latencia y una comunidad activa 24/7, este es tu sitio."
