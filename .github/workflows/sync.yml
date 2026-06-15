@@ -1,34 +1,34 @@
-name: Sync Fork
-on:
-  schedule:
-    - cron: "*/30 * * * *"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Sync with upstream ignoring workflows
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git remote add upstream https://github.com/Pablox365/warborntest-3eae0eee.git
-          git fetch upstream
-          
-          # Merge upstream pero recuperamos nuestros workflows
-          git checkout upstream/main -- .
-          git checkout HEAD -- .github/workflows/
+# name: Sync Fork
+# on:
+#   schedule:
+#     - cron: "*/30 * * * *"
+#   workflow_dispatch:
+# 
+# permissions:
+#   contents: write
+# 
+# jobs:
+# #   sync:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+# #         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+#           token: ${{ secrets.GITHUB_TOKEN }}
+# 
+#       - name: Sync with upstream ignoring workflows
+#         run: |
+#           git config user.name "github-actions[bot]"
+#           git config user.email "github-actions[bot]@users.noreply.github.com"
+#           
+# #           git remote add upstream https://github.com/Pablox365/warborntest-3eae0eee.git
+#           git fetch upstream
+#           
+#           # Merge upstream pero recuperamos nuestros workflows
+#           git checkout upstream/main -- .
+#           git checkout HEAD -- .github/workflows/
           
           # Solo commitear si hay cambios
-          git diff --staged --quiet || git commit -m "chore: sync with upstream"
-          git push origin main
+#           git diff --staged --quiet || git commit -m "chore: sync with upstream"
+#           git push origin main
