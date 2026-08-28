@@ -1,5 +1,4 @@
 import warbornNormal from "@/assets/warborn-normal.png";
-import warbornHardcore from "@/assets/warborn-hardcore-clean.png";
 
 const socials = [
   {
@@ -58,7 +57,6 @@ const Footer = () => (
           </p>
           <div className="flex items-center justify-center md:justify-start gap-3">
             <img src={warbornNormal} alt="Normal" className="h-6 opacity-60 hover:opacity-100 transition-opacity" />
-            <img src={warbornHardcore} alt="Hardcore" className="h-6 opacity-60 hover:opacity-100 transition-opacity" />
           </div>
         </div>
 

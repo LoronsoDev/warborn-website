@@ -142,7 +142,7 @@ const HeroSection = () => {
           {/* HUD quick status */}
           <div className={`flex flex-col sm:flex-row gap-3 transition-all duration-700 delay-600 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
             <ServerQuickStatus name="NORMAL" players={data?.normal?.players ?? 0} maxPlayers={data?.normal?.maxPlayers ?? 0} online={!!data?.normal?.online} loading={isLoading} />
-            <ServerQuickStatus name="HARDCORE" players={data?.hardcore?.players ?? 0} maxPlayers={data?.hardcore?.maxPlayers ?? 0} online={!!data?.hardcore?.online} loading={isLoading} />
+            <ServerQuickStatus name="MILSIM" players={data?.milsim?.players ?? 0} maxPlayers={data?.milsim?.maxPlayers ?? 0} online={!!data?.milsim?.online} loading={isLoading} />
           </div>
         </div>
       </div>

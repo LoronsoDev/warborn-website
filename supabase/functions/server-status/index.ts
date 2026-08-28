@@ -4,9 +4,8 @@ const corsHeaders = {
 };
 
 const SERVERS = {
-  normal: "38708697",
-  hardcore: "38672956",
-  milsim: "38109381",
+  normal: "39028513",
+  milsim: "39196762",
 };
 
 type Mod = { modId: string; name: string; version: string };
@@ -94,12 +93,11 @@ async function fetchServer(id: string) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    const [normal, hardcore, milsim] = await Promise.all([
+    const [normal, milsim] = await Promise.all([
       fetchServer(SERVERS.normal),
-      fetchServer(SERVERS.hardcore),
       fetchServer(SERVERS.milsim),
     ]);
-    return new Response(JSON.stringify({ normal, hardcore, milsim, fetchedAt: new Date().toISOString() }), {
+    return new Response(JSON.stringify({ normal, milsim, fetchedAt: new Date().toISOString() }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
     });

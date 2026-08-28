@@ -3,7 +3,6 @@ import { SectionHeader } from "./ServersSection";
 import { Activity, Users, MapPin, Box, Globe, Wrench, ExternalLink, Loader2 } from "lucide-react";
 import { useLiveServers, type LiveServer } from "@/hooks/useLiveServers";
 import warbornNormal from "@/assets/warborn-normal.png";
-import warbornHardcore from "@/assets/warborn-hardcore-clean.png";
 
 const StatusSection = () => {
   const { ref, isVisible } = useScrollAnimation();
@@ -20,7 +19,7 @@ const StatusSection = () => {
           subtitle="Sincronizado con BattleMetrics. Actualización cada 60s."
         />
 
-        <div className="grid md:grid-cols-2 gap-5 md:gap-6 mt-10 md:mt-12 items-stretch">
+        <div className="grid gap-5 md:gap-6 mt-10 md:mt-12 items-stretch max-w-lg mx-auto">
           <ServerPanel
             title="WARBORN NORMAL"
             logo={warbornNormal}
@@ -28,16 +27,7 @@ const StatusSection = () => {
             loading={isLoading}
             visible={isVisible}
             delay={300}
-            bmUrl="https://www.battlemetrics.com/servers/reforger/38708697"
-          />
-          <ServerPanel
-            title="WARBORN HARDCORE"
-            logo={warbornHardcore}
-            data={data?.hardcore}
-            loading={isLoading}
-            visible={isVisible}
-            delay={500}
-            bmUrl="https://www.battlemetrics.com/servers/reforger/38672956"
+            bmUrl="https://www.battlemetrics.com/servers/reforger/39028513"
           />
         </div>
       </div>

@@ -13,9 +13,9 @@ const ModsSection = () => {
   const mods: LiveMod[] = useMemo(() => {
     const map = new Map<string, LiveMod>();
     for (const m of data?.normal?.mods ?? []) map.set(m.modId, m);
-    for (const m of data?.hardcore?.mods ?? []) if (!map.has(m.modId)) map.set(m.modId, m);
+    for (const m of data?.milsim?.mods ?? []) if (!map.has(m.modId)) map.set(m.modId, m);
     return Array.from(map.values());
-  }, [data?.normal?.mods, data?.hardcore?.mods]);
+  }, [data?.normal?.mods, data?.milsim?.mods]);
 
   const filtered = useMemo(() => {
     if (!search) return mods;

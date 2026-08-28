@@ -159,7 +159,7 @@ const MilsimSection = () => {
                 <Copy className="w-3.5 h-3.5" />
               </button>
               <a
-                href="https://www.battlemetrics.com/servers/reforger/38109381"
+                href="https://www.battlemetrics.com/servers/reforger/39196762"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-white transition-all flex items-center gap-1 text-[9px] font-heading tracking-[0.15em] shrink-0"
