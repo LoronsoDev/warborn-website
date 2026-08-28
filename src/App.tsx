@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -8,7 +7,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { RadioProvider } from "@/contexts/RadioContext";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import CookieConsent from "@/components/CookieConsent";
-import LoadingScreen from "@/components/LoadingScreen";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -27,23 +25,7 @@ const RouteTracker = () => {
   return null;
 };
 
-const App = () => {
-  // Show on every full page load (refresh included). Skip only for very recent
-  // loads (<60s) so SPA-like navigations don't re-trigger it.
-  const [loading, setLoading] = useState(() => {
-    if (typeof window === "undefined") return true;
-    const last = Number(sessionStorage.getItem("warborn-loaded-at") || 0);
-    return Date.now() - last > 60_000;
-  });
-
-  useEffect(() => {
-    if (!loading) return;
-    // Safety net: ensure we never block forever
-    const t = setTimeout(() => setLoading(false), 4000);
-    return () => clearTimeout(t);
-  }, [loading]);
-
-  return (
+const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -52,14 +34,6 @@ const App = () => {
         <RadioProvider>
           <BrowserRouter>
             <RouteTracker />
-            {loading && (
-              <LoadingScreen
-                onDone={() => {
-                  sessionStorage.setItem("warborn-loaded-at", String(Date.now()));
-                  setLoading(false);
-                }}
-              />
-            )}
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/servidores" element={<Servidores />} />
@@ -79,7 +53,6 @@ const App = () => {
       </TooltipProvider>
     </QueryClientProvider>
   </HelmetProvider>
-  );
-};
+);
 
 export default App;
