@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { SectionHeader } from "./ServersSection";
 import { ShoppingBag, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import OrderDialog from "./OrderDialog";
+import { products } from "@/data/products";
 import productTshirt from "@/assets/product-tshirt.jpg";
 import productHoodie from "@/assets/product-hoodie.jpg";
 import productCap from "@/assets/product-cap.jpg";
@@ -32,22 +31,13 @@ const MerchSection = () => {
   const [orderProduct, setOrderProduct] = useState<any>(null);
   const [detailProduct, setDetailProduct] = useState<any>(null);
 
-  const { data: products } = useQuery({
-    queryKey: ["products"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("*").eq("active", true).order("sort_order");
-      if (error) throw error;
-      return data;
-    },
-  });
-
   return (
     <section id="merch" className="relative py-24 md:py-32" ref={ref}>
       <div className="container mx-auto px-4 relative z-10">
         <SectionHeader visible={isVisible} label="TIENDA" title="MERCH" subtitle="Representa a la comunidad." />
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 mt-12">
-          {(products || []).map((p, i) => {
+          {products.map((p, i) => {
             const imgs = getImages(p);
             return (
               <div
