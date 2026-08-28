@@ -11,7 +11,6 @@ import DonationsSection from "@/components/DonationsSection";
 import PartnersSection from "@/components/PartnersSection";
 import FeedbackSection from "@/components/FeedbackSection";
 import Footer from "@/components/Footer";
-import HiddenAdminTrigger from "@/components/HiddenAdminTrigger";
 
 const Index = () => (
   <>
@@ -36,7 +35,6 @@ const Index = () => (
       <PartnersSection />
       <FeedbackSection />
       <Footer />
-      <HiddenAdminTrigger />
     </main>
   </>
 );

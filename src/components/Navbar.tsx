@@ -15,7 +15,6 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#hero");
-  const [logoClicks, setLogoClicks] = useState(0);
 
   useEffect(() => {
     const onScroll = () => {
@@ -33,25 +32,12 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Triple-click on logo opens admin (hidden fallback)
-  useEffect(() => {
-    if (logoClicks === 0) return;
-    if (logoClicks >= 3) {
-      window.dispatchEvent(new CustomEvent("warborn:open-admin"));
-      setLogoClicks(0);
-      return;
-    }
-    const t = setTimeout(() => setLogoClicks(0), 800);
-    return () => clearTimeout(t);
-  }, [logoClicks]);
-
   const handleClick = (href: string) => {
     setMobileOpen(false);
     document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleLogoClick = () => {
-    setLogoClicks((c) => c + 1);
     handleClick("#hero");
   };
 
