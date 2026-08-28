@@ -19,7 +19,14 @@ export type Database = {
           active: boolean
           content: string | null
           created_at: string
+          detailed_description: string | null
+          emoji: string | null
+          expires_at: string | null
           id: string
+          play_sound: boolean
+          priority: number
+          short_text: string | null
+          starts_at: string | null
           title: string
           type: string
           updated_at: string
@@ -28,7 +35,14 @@ export type Database = {
           active?: boolean
           content?: string | null
           created_at?: string
+          detailed_description?: string | null
+          emoji?: string | null
+          expires_at?: string | null
           id?: string
+          play_sound?: boolean
+          priority?: number
+          short_text?: string | null
+          starts_at?: string | null
           title: string
           type?: string
           updated_at?: string
@@ -37,9 +51,67 @@ export type Database = {
           active?: boolean
           content?: string | null
           created_at?: string
+          detailed_description?: string | null
+          emoji?: string | null
+          expires_at?: string | null
           id?: string
+          play_sound?: boolean
+          priority?: number
+          short_text?: string | null
+          starts_at?: string | null
           title?: string
           type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bug_reports: {
+        Row: {
+          admin_notes: string | null
+          ai_summary: string | null
+          category: string | null
+          created_at: string
+          description: string
+          discord_id: string
+          id: string
+          player_name: string
+          report_type: string
+          server: string
+          severity: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          ai_summary?: string | null
+          category?: string | null
+          created_at?: string
+          description: string
+          discord_id: string
+          id?: string
+          player_name: string
+          report_type?: string
+          server?: string
+          severity?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          ai_summary?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string
+          discord_id?: string
+          id?: string
+          player_name?: string
+          report_type?: string
+          server?: string
+          severity?: string | null
+          status?: string
+          title?: string
           updated_at?: string
         }
         Relationships: []
@@ -47,32 +119,82 @@ export type Database = {
       feedback: {
         Row: {
           approved: boolean
+          avatar_url: string | null
           created_at: string
           id: string
           message: string
+          moderation_reason: string | null
           name: string
           rating: number
           updated_at: string
         }
         Insert: {
           approved?: boolean
+          avatar_url?: string | null
           created_at?: string
           id?: string
           message: string
+          moderation_reason?: string | null
           name: string
           rating: number
           updated_at?: string
         }
         Update: {
           approved?: boolean
+          avatar_url?: string | null
           created_at?: string
           id?: string
           message?: string
+          moderation_reason?: string | null
           name?: string
           rating?: number
           updated_at?: string
         }
         Relationships: []
+      }
+      feedback_replies: {
+        Row: {
+          approved: boolean
+          avatar_url: string | null
+          created_at: string
+          feedback_id: string
+          id: string
+          message: string
+          moderation_reason: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean
+          avatar_url?: string | null
+          created_at?: string
+          feedback_id: string
+          id?: string
+          message: string
+          moderation_reason?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean
+          avatar_url?: string | null
+          created_at?: string
+          feedback_id?: string
+          id?: string
+          message?: string
+          moderation_reason?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_replies_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "feedback"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mods: {
         Row: {
@@ -174,6 +296,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      page_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          path: string | null
+          section: string | null
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          path?: string | null
+          section?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          path?: string | null
+          section?: string | null
+          session_id?: string | null
+        }
+        Relationships: []
       }
       products: {
         Row: {
